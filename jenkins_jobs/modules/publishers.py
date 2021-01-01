@@ -7599,6 +7599,107 @@ def hipchat(registry, xml_parent, data):
     helpers.convert_mapping_to_xml(hipchat, data, mapping, fail_required=False)
 
 
+def mattermost(registry, xml_parent, data):
+    """yaml: mattermost
+    Publisher that sends mattermost notifications on job events.
+
+    Requires the Jenkins :jenkins-plugins:`Mattermost Plugin <mattermost>`
+
+    :arg str endpoint: Your Mattermost incoming webhook url. (default '')
+    :arg str build-server-url: Specify the URL for your server installation.
+        (default '')
+    :arg str room: A comma separated list of rooms / channels to post the
+        notifications to. (default '')
+    :arg bool notify-start: Send notification when the job starts.
+        (default false)
+    :arg bool notify-success: Send notification on success.
+        (default false)
+    :arg bool notify-aborted: Send notification when job is aborted.
+        (default false)
+    :arg bool notify-not-built: Send notification when job set to NOT_BUILT
+        status. (default false)
+    :arg bool notify-unstable: Send notification when job becomes unstable.
+     (default false)
+    :arg bool notify-failure: Send notification when job fails for the first
+        time (previous build was a success).  (default false)
+    :arg bool notify-back-to-normal: Send notification when job is succeeding
+        again after being unstable or failed (default false)
+    :arg bool notify-repeated-failure: Send notification when job fails
+        successively (previous build was also a failure).
+        (default false)
+    :arg bool include-test-summary: Include the test summary.
+        (default false)
+    :arg str commit-info-choice: What commit information to include into
+        notification message, "NONE" includes nothing about commits, "AUTHORS"
+        includes commit list with authors only, and "AUTHORS_AND_TITLES"
+        includes commit list with authors and titles. (default "NONE")
+    :arg bool include-custom-message: Include a custom message into the
+        notification. (default false)
+    :arg str custom-message: Custom message to be included for all statuses.
+     (default '')
+
+    Minimal example:
+
+    .. literalinclude::
+        /../../tests/publishers/fixtures/mattermost001.yaml
+        :language: yaml
+
+    Full example:
+
+    .. literalinclude::
+        /../../tests/publishers/fixtures/mattermost002.yaml
+        :language: yaml
+
+    """
+
+    def _add_xml(elem, name, value=""):
+        if isinstance(value, bool):
+            value = str(value).lower()
+        XML.SubElement(elem, name).text = value
+
+    mapping = (
+        ("endpoint", "endpoint", ""),
+        ("build-server-url", "buildServerUrl", ""),
+        ("room", "room", ""),
+        ("notify-start", "startNotification", False),
+        ("notify-success", "notifySuccess", False),
+        ("notify-aborted", "notifyAborted", False),
+        ("notify-not-built", "notifyNotBuilt", False),
+        ("notify-unstable", "notifyUnstable", False),
+        ("notify-failure", "notifyFailure", False),
+        ("notify-back-to-normal", "notifyBackToNormal", False),
+        ("notify-repeated-failure", "notifyRepeatedFailure", False),
+        ("include-test-summary", "includeTestSummary", False),
+        ("commit-info-choice", "commitInfoChoice", "NONE"),
+        ("include-custom-message", "includeCustomMessage", False),
+        ("custom-message", "customMessage", ""),
+    )
+
+    commit_info_choices = ["NONE", "AUTHORS", "AUTHORS_AND_TITLES"]
+
+    mattermost = XML.SubElement(
+        xml_parent, "jenkins.plugins.mattermost.MattermostNotifier"
+    )
+
+    for yaml_name, xml_name, default_value in mapping:
+        value = data.get(yaml_name, default_value)
+
+        # 'commit-info-choice' is enumerated type
+        if yaml_name == "commit-info-choice" and value not in commit_info_choices:
+            raise InvalidAttributeError(yaml_name, value, commit_info_choices)
+
+        # Ensure that custom-message is set when include-custom-message is set
+        # to true.
+        if (
+            yaml_name == "include-custom-message"
+            and data is False
+            and not data.get("custom-message", "")
+        ):
+            raise MissingAttributeError("custom-message")
+
+        _add_xml(mattermost, xml_name, value)
+
+
 def slack(registry, xml_parent, data):
     """yaml: slack
     Publisher that sends slack notifications on job events.
