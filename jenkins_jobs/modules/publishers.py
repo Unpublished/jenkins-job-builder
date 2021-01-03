@@ -5311,6 +5311,7 @@ def git(registry, xml_parent, data):
                                     - otherwise, nothing will be pushed.
                                     (default true)
     :arg bool force-push: Add force option to git push (default false)
+    :arg bool push-existing-tags: Pushes all existing tags (default false)
     :arg list tags: tags to push at the completion of the build
 
         :tag: * **remote** (`str`) remote repo name to push to
@@ -5356,6 +5357,7 @@ def git(registry, xml_parent, data):
         ("push-merge", "pushMerge", False),
         ("push-only-if-success", "pushOnlyIfSuccess", True),
         ("force-push", "forcePush", False),
+        ("push-existing-tags", "pushExistingTags", None),
     ]
 
     tag_mappings = [
@@ -5381,7 +5383,7 @@ def git(registry, xml_parent, data):
 
     top = XML.SubElement(xml_parent, "hudson.plugins.git.GitPublisher")
     XML.SubElement(top, "configVersion").text = "2"
-    helpers.convert_mapping_to_xml(top, data, mappings, fail_required=True)
+    helpers.convert_mapping_to_xml(top, data, mappings, fail_required=False)
 
     tags = data.get("tags", [])
     if tags:
