@@ -8563,7 +8563,7 @@ class Publishers(jenkins_jobs.modules.base.Base):
     component_list_type = "publishers"
 
     def gen_xml(self, xml_parent, data):
-        if data.get("project-type", "freestyle") == "pipeline":
+        if data.get("project-type", "freestyle") in {"folder", "pipeline"}:
             logger.debug("Publishers skipped for Pipeline job")
             return
 

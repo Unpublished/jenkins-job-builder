@@ -132,7 +132,10 @@ class General(jenkins_jobs.modules.base.Base):
         if desc_text is not None:
             description = XML.SubElement(xml, "description")
             description.text = desc_text
-        XML.SubElement(xml, "keepDependencies").text = "false"
+
+        project_type = data.get("project-type", "freestyle")
+        if project_type != "folder":
+            XML.SubElement(xml, "keepDependencies").text = "false"
 
         # Need to ensure we support the None parameter to allow disabled to
         # remain the last setting if the user purposely adds and then removes
@@ -144,7 +147,7 @@ class General(jenkins_jobs.modules.base.Base):
 
         if "display-name" in data:
             XML.SubElement(xml, "displayName").text = data["display-name"]
-        if data.get("project-type", "freestyle") != "pipeline":
+        if project_type not in {"folder", "pipeline"}:
             if data.get("block-downstream"):
                 XML.SubElement(xml, "blockBuildWhenDownstreamBuilding").text = "true"
             else:
@@ -156,21 +159,22 @@ class General(jenkins_jobs.modules.base.Base):
         authtoken = data.get("auth-token", None)
         if authtoken is not None:
             XML.SubElement(xml, "authToken").text = authtoken
-        if data.get("project-type", "freestyle") != "pipeline":
-            if data.get("concurrent"):
-                XML.SubElement(xml, "concurrentBuild").text = "true"
+        if project_type != "folder":
+            if project_type != "pipeline":
+                if data.get("concurrent"):
+                    XML.SubElement(xml, "concurrentBuild").text = "true"
+                else:
+                    XML.SubElement(xml, "concurrentBuild").text = "false"
             else:
-                XML.SubElement(xml, "concurrentBuild").text = "false"
-        else:
-            if not data.get("concurrent"):
-                properties = xml.find("properties")
-                if properties is None:
-                    properties = XML.SubElement(xml, "properties")
-                XML.SubElement(
-                    properties,
-                    "org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty",
-                )
-        if data.get("project-type", "freestyle") != "pipeline":
+                if not data.get("concurrent"):
+                    properties = xml.find("properties")
+                    if properties is None:
+                        properties = XML.SubElement(xml, "properties")
+                    XML.SubElement(
+                        properties,
+                        "org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty",
+                    )
+        if project_type not in {"folder", "pipeline"}:
             if "workspace" in data:
                 XML.SubElement(xml, "customWorkspace").text = str(data["workspace"])
         if (xml.tag == "matrix-project") and ("child-workspace" in data):
@@ -180,7 +184,7 @@ class General(jenkins_jobs.modules.base.Base):
         if "quiet-period" in data:
             XML.SubElement(xml, "quietPeriod").text = str(data["quiet-period"])
         node = data.get("node", None)
-        if data.get("project-type", "freestyle") != "pipeline":
+        if project_type not in {"folder", "pipeline"}:
             if node:
                 XML.SubElement(xml, "assignedNode").text = node
                 XML.SubElement(xml, "canRoam").text = "false"

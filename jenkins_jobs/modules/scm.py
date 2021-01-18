@@ -1789,6 +1789,7 @@ class SCM(jenkins_jobs.modules.base.Base):
 
         # multibranch-pipeline scm implementation is incompatible with SCM
         if data.get("project-type") in [
+            "folder",
             "githuborg",
             "multibranch",
             "multibranch-defaults",

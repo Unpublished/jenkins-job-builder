@@ -2987,7 +2987,7 @@ class Wrappers(jenkins_jobs.modules.base.Base):
     component_list_type = "wrappers"
 
     def gen_xml(self, xml_parent, data):
-        if data.get("project-type", "freestyle") == "pipeline":
+        if data.get("project-type", "freestyle") in {"folder", "pipeline"}:
             logger.debug("Build wrappers skipped for Pipeline job")
             return
 

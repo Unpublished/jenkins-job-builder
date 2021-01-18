@@ -7,11 +7,6 @@
   <healthMetrics/>
   <actions/>
   <description>foo bar&lt;!-- Managed by Jenkins Job Builder --&gt;</description>
-  <keepDependencies>false</keepDependencies>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <concurrentBuild>false</concurrentBuild>
-  <canRoam>true</canRoam>
   <properties>
     <com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty>
       <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
@@ -19,7 +14,4 @@
       <permission>hudson.model.Item.ExtendedRead:foobar</permission>
     </com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty>
   </properties>
-  <scm class="hudson.scm.NullSCM"/>
-  <publishers/>
-  <buildWrappers/>
 </com.cloudbees.hudson.plugins.folder.Folder>
