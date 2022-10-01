@@ -6596,6 +6596,14 @@ def conditional_publisher(registry, xml_parent, data):
                        representation of true
 
                          :condition-expression: Expression to expand
+    cause              Run the action if the build is triggered by
+                       given cause
+
+                         :condition-cause: Cause to check
+                         :condition-exclusive-cause: Cause must be
+                            the only one causing this build
+                            to be triggered
+
     current-status     Run the action if the current build status is
                        within the configured range
 
@@ -6656,6 +6664,12 @@ def conditional_publisher(registry, xml_parent, data):
         elif kind == "boolean-expression":
             ctag.set("class", class_pkg + ".core.BooleanCondition")
             XML.SubElement(ctag, "token").text = cdata["%s-expression" % prefix]
+        elif kind == "cause":
+            ctag.set("class", class_pkg + ".core.CauseCondition")
+            XML.SubElement(ctag, "buildCause").text = cdata["%s-cause" % prefix]
+            XML.SubElement(ctag, "exclusiveCause").text = str(
+                cdata["%s-exclusive-cause" % prefix]
+            ).lower()
         elif kind == "current-status":
             ctag.set("class", class_pkg + ".core.StatusCondition")
             wr = XML.SubElement(ctag, "worstResult")
