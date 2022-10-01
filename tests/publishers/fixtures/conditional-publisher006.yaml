@@ -1,0 +1,9 @@
+publishers:
+    - conditional-publisher:
+        - condition-kind: cause
+          condition-cause: SCM_CAUSE
+          condition-exclusive-cause: True
+          action:
+              - archive:
+                  artifacts: '**/**'
+                  allow-empty: 'true'
