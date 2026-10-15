@@ -387,6 +387,10 @@ def bitbucket_scm(xml_parent, data):
         Requires the :jenkins-plugins:`SCM Filter Branch PR Plugin
         <scm-filter-branch-pr>`.
         Refer to :func:`~add_filter_branch_pr_behaviors <add_filter_branch_pr_behaviors>`.
+    :arg dict inactive-branch-filter: Filter out inactive branches and old
+        tags. Requires the :jenkins-plugins:`Multibranch Filter Plugin
+        <multibranch-filter>`.
+        Refer to :func:`~add_inactive_branch_filter <add_inactive_branch_filter>`.
     :arg str discover-branch: Discovers branches on the repository.
         Valid options: ex-pr, only-pr, all.
         Value is not specified by default.
@@ -637,6 +641,7 @@ def bitbucket_scm(xml_parent, data):
         )
 
     add_filter_by_name_wildcard_behaviors(traits, data)
+    add_inactive_branch_filter(traits, data)
 
     # handle the default git extensions like:
     # - clean
@@ -671,6 +676,10 @@ def gerrit_scm(xml_parent, data):
     :arg str head-filter-regex: A regular expression for filtering
         discovered source branches. Requires the :jenkins-plugins:`SCM API
         Plugin <scm-api>`.
+    :arg dict inactive-branch-filter: Filter out inactive branches and old
+        tags. Requires the :jenkins-plugins:`Multibranch Filter Plugin
+        <multibranch-filter>`.
+        Refer to :func:`~add_inactive_branch_filter <add_inactive_branch_filter>`.
     :arg list build-strategies: Provides control over whether to build a branch
         (or branch like things such as change requests and tags) whenever it is
         discovered initially or a change from the previous revision has been
@@ -828,6 +837,8 @@ def gerrit_scm(xml_parent, data):
             checks_trait, checks, checks_source_mapping, fail_required=True
         )
 
+    add_inactive_branch_filter(traits, data)
+
     # handle the default git extensions like:
     # - clean
     # - shallow-clone
@@ -863,6 +874,10 @@ def git_scm(xml_parent, data):
         Requires the :jenkins-plugins:`SCM Filter Branch PR Plugin
         <scm-filter-branch-pr>`.
         Refer to :func:`~add_filter_branch_pr_behaviors <add_filter_branch_pr_behaviors>`.
+    :arg dict inactive-branch-filter: Filter out inactive branches and old
+        tags. Requires the :jenkins-plugins:`Multibranch Filter Plugin
+        <multibranch-filter>`.
+        Refer to :func:`~add_inactive_branch_filter <add_inactive_branch_filter>`.
     :arg list build-strategies: Provides control over whether to build a branch
         (or branch like things such as change requests and tags) whenever it is
         discovered initially or a change from the previous revision has been
@@ -964,6 +979,7 @@ def git_scm(xml_parent, data):
         build_strategies(xml_parent, data)
 
     add_filter_by_name_wildcard_behaviors(traits, data)
+    add_inactive_branch_filter(traits, data)
 
     # handle the default git extensions like:
     # - clean
@@ -1014,6 +1030,10 @@ def github_scm(xml_parent, data):
         Requires the :jenkins-plugins:`SCM Filter Branch PR Plugin
         <scm-filter-branch-pr>`.
         Refer to :func:`~add_filter_branch_pr_behaviors <add_filter_branch_pr_behaviors>`.
+    :arg dict inactive-branch-filter: Filter out inactive branches and old
+        tags. Requires the :jenkins-plugins:`Multibranch Filter Plugin
+        <multibranch-filter>`.
+        Refer to :func:`~add_inactive_branch_filter <add_inactive_branch_filter>`.
     :arg list build-strategies: Provides control over whether to build a branch
         (or branch like things such as change requests and tags) whenever it is
         discovered initially or a change from the previous revision has been
@@ -1205,6 +1225,7 @@ def github_scm(xml_parent, data):
     add_github_checks_traits(traits, data)
     add_notification_context_trait(traits, data)
     add_filter_by_name_wildcard_behaviors(traits, data)
+    add_inactive_branch_filter(traits, data)
 
     # handle the default git extensions like:
     # - clean
@@ -2280,6 +2301,59 @@ def add_filter_by_name_wildcard_behaviors(traits, data):
             wscmf_name_mapping,
             fail_required=True,
         )
+
+
+def add_inactive_branch_filter(traits, data):
+    """Configure filtering of inactive branches and old tags.
+
+    Requires the :jenkins-plugins:`Multibranch Filter Plugin
+    <multibranch-filter>`.
+
+    :arg dict inactive-branch-filter: Definition of the filter.
+
+        * **inactivity-days** (int): Exclude branches without commits for
+            this number of days. Set to 0 to disable branch inactivity
+            filtering. (required)
+        * **tag-max-age-days** (int): Exclude tags older than this number of
+            days. Set to 0 to keep all tags. (default 0)
+        * **allowlist** (list or str): Regular expressions for branch and tag
+            names to always include. (default ['master', 'main'])
+        * **denylist** (list or str): Regular expressions for branch and tag
+            names to always exclude. Takes precedence over the allowlist.
+            (default [])
+
+    Change requests are always included unless matched by the denylist.
+
+    Example:
+
+    .. literalinclude::
+       /../../tests/multibranch/fixtures/scm_git_inactive_branch_filter.yaml
+    """
+    ibf = data.get("inactive-branch-filter", None)
+    if ibf is None:
+        return
+
+    trait = XML.SubElement(
+        traits,
+        "io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait",
+        {"plugin": "multibranch-filter"},
+    )
+    mapping = [
+        ("inactivity-days", "inactivityDays", None),
+        ("tag-max-age-days", "tagMaxAgeDays", 0),
+    ]
+    helpers.convert_mapping_to_xml(trait, ibf, mapping, fail_required=True)
+
+    for key, tag, default in (
+        ("allowlist", "allowlist", ["master", "main"]),
+        ("denylist", "denylist", []),
+    ):
+        patterns = ibf.get(key, default)
+        if patterns is None:
+            patterns = []
+        elif not isinstance(patterns, list):
+            patterns = [patterns]
+        XML.SubElement(trait, tag).text = "\n".join(str(p) for p in patterns)
 
 
 def add_notification_context_trait(traits, data):

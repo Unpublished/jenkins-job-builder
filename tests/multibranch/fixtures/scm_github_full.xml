@@ -91,6 +91,14 @@
               <contextLabel>jenkins.example.com/my_context</contextLabel>
               <typeSuffix>false</typeSuffix>
             </org.jenkinsci.plugins.githubScmTraitNotificationContext.NotificationContextTrait>
+            <io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait plugin="multibranch-filter">
+              <inactivityDays>14</inactivityDays>
+              <tagMaxAgeDays>30</tagMaxAgeDays>
+              <allowlist>master
+release/.*</allowlist>
+              <denylist>wip/.*
+PR-.*</denylist>
+            </io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait>
             <jenkins.plugins.git.traits.CleanAfterCheckoutTrait>
               <extension class="hudson.plugins.git.extensions.impl.CleanCheckout"/>
             </jenkins.plugins.git.traits.CleanAfterCheckoutTrait>

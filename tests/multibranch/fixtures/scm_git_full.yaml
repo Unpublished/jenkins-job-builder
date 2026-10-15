@@ -29,6 +29,15 @@ scm:
         filter-by-name-wildcard:
             includes: '*'
             excludes: 'master'
+        inactive-branch-filter:
+            inactivity-days: 10
+            tag-max-age-days: 90
+            allowlist:
+                - master
+                - main
+                - '.*release.*'
+            denylist:
+                - 'wip/.*'
         property-strategies:
             all-branches:
                 - suppress-scm-triggering: true

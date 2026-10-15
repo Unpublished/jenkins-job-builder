@@ -55,6 +55,13 @@
               <queryOperator>SCHEME</queryOperator>
               <queryString>jenkins</queryString>
             </jenkins.plugins.gerrit.traits.FilterChecksTrait>
+            <io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait plugin="multibranch-filter">
+              <inactivityDays>60</inactivityDays>
+              <tagMaxAgeDays>0</tagMaxAgeDays>
+              <allowlist>master
+2024</allowlist>
+              <denylist>wip/.*</denylist>
+            </io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait>
             <jenkins.plugins.git.traits.CleanAfterCheckoutTrait>
               <extension class="hudson.plugins.git.extensions.impl.CleanCheckout"/>
             </jenkins.plugins.git.traits.CleanAfterCheckoutTrait>

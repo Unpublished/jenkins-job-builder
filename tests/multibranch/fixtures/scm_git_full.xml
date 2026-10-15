@@ -66,6 +66,14 @@
               <includes>*</includes>
               <excludes>master</excludes>
             </jenkins.scm.impl.trait.WildcardSCMHeadFilterTrait>
+            <io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait plugin="multibranch-filter">
+              <inactivityDays>10</inactivityDays>
+              <tagMaxAgeDays>90</tagMaxAgeDays>
+              <allowlist>master
+main
+.*release.*</allowlist>
+              <denylist>wip/.*</denylist>
+            </io.jenkins.plugins.multibranchfilter.InactiveBranchFilterTrait>
             <jenkins.plugins.git.traits.CleanAfterCheckoutTrait>
               <extension class="hudson.plugins.git.extensions.impl.CleanCheckout"/>
             </jenkins.plugins.git.traits.CleanAfterCheckoutTrait>

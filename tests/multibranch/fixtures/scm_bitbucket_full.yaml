@@ -103,3 +103,6 @@ scm:
         use-author: true
         wipe-workspace: true
         lfs-pull: true
+        inactive-branch-filter:
+            inactivity-days: 0
+            tag-max-age-days: 365

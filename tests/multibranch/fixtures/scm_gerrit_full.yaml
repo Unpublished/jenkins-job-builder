@@ -71,3 +71,9 @@ scm:
         use-author: true
         wipe-workspace: true
         lfs-pull: true
+        inactive-branch-filter:
+            inactivity-days: 60
+            allowlist:
+                - master
+                - 2024
+            denylist: 'wip/.*'

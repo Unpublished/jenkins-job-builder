@@ -121,3 +121,12 @@ scm:
         use-author: true
         wipe-workspace: true
         lfs-pull: true
+        inactive-branch-filter:
+            inactivity-days: 14
+            tag-max-age-days: 30
+            allowlist: |-
+                master
+                release/.*
+            denylist:
+                - 'wip/.*'
+                - 'PR-.*'
