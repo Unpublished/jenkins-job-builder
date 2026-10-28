@@ -28,7 +28,6 @@ from jenkins_jobs.config import JJBConfig
 from jenkins_jobs import utils
 from jenkins_jobs import version
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 
@@ -159,6 +158,7 @@ class JenkinsJobs(object):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
 
     # utf-8 workaround for avoiding unicode errors in stdout/stderr
     # see https://stackoverflow.com/a/2001767/99834
